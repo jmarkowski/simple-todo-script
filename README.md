@@ -15,6 +15,8 @@ Items are listed in the order they are added.
 
 # Usage
 
+## Add
+
 Initially, the todo list is empty. Let's add a couple of items.
 
 ```bash
@@ -32,6 +34,8 @@ $ todo.py -a 'Buy cat food.'
 
 ```
 
+## Modify
+
 You can modify your todo list.
 
 ```bash
@@ -46,7 +50,9 @@ Reword:   Buy dog food.
 
 ```
 
-Finally, you can remove items from your todo list when you're done.
+## Remove
+
+You can remove items from your todo list when you're done.
 
 ```bash
 $ todo.py -r 1
@@ -56,3 +62,53 @@ Removed: Return books to the library.
  1 - Buy dog food.
 
 ```
+
+## Categorize
+
+Finally, you may also categorize your todo list by prefixing the todo.
+
+```bash
+$ todo.py -a 'HOME: Fix faucet.'
+
+ 1 - Buy dog food.
+
+HOME:
+
+ 2 - Fix faucet.
+
+```
+
+```bash
+$ todo -a 'PROJECT: Finish design diagram.'
+
+ 1 - Buy dog food.
+
+HOME:
+
+ 2 - Fix faucet.
+
+PROJECT:
+
+ 3 - Finish design diagram.
+
+```
+
+Any new categorized todo items will automatically get grouped together.
+
+```bash
+$ todo -a 'HOME: Replace bathroom mirror.'
+
+ 1 - Buy dog food.
+
+PROJECT:
+
+ 3 - Finish design diagram.
+
+HOME:
+
+ 2 - Fix faucet.
+
+ 4 - Replace bathroom mirror.
+
+```
+

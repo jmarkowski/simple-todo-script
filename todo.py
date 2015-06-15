@@ -34,8 +34,23 @@ def save_todo_list():
 def print_todo_list():
     global todo_list
 
+    found_categories = set([])
+
+    # Print all the uncategorized todos first
     for idx,item in enumerate(todo_list):
-        print('\n {0} - {1}'.format(idx+1, item))
+        cat_idx = item.rfind(':')
+        if cat_idx > 0:
+            found_categories.add(item[0:cat_idx])
+        else:
+            print('\n {0} - {1}'.format(idx+1, item))
+
+    # Print all categorized todos
+    for cat in found_categories:
+        print('\n{0}:'.format(cat))
+        for idx,item in enumerate(todo_list):
+            cat_idx = item.rfind(':')
+            if cat_idx > 0 and cat == item[0:cat_idx]:
+                print('\n {0} - {1}'.format(idx+1, item[cat_idx+1:].lstrip()))
 
 
 def add_todo(todo):

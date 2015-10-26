@@ -10,6 +10,10 @@ TODO_FILE = os.path.expanduser('~/.todo_list')
 todo_list = []
 
 
+class RetCode():
+    OK, ERR, ARG, WARN = range(4)
+
+
 def load_todo_list():
     global todo_list, TODO_FILE
 
@@ -129,8 +133,9 @@ def main():
 
     print_todo_list()
 
-    return 0
+    return RetCode.OK
 
 
 if __name__ == '__main__':
     retcode = main()
+    sys.exit(retcode)

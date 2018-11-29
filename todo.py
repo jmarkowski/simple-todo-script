@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
+import argparse
 import os
 import sys
 import pickle
-from optparse import OptionParser
 
 
 TODO_FILE = os.path.expanduser('~/.todo_list')
@@ -82,45 +82,57 @@ def modify_todo(idx):
 
 
 def parse_arguments():
-    parser = OptionParser()
+    parser = argparse.ArgumentParser(
+        description='Python Todo Script'
+    )
 
-    parser.usage = os.path.basename(sys.argv[0]) + ' [options]'
+    parser.add_argument(
+        '-a', '--add',
+        dest='add',
+        metavar='"item"',
+        help='add a todo item'
+    )
 
-    parser.add_option('-a', '--add', dest='add', metavar='"item"',
-        help='add a todo item')
+    parser.add_argument(
+        '-r', '--remove',
+        dest='remove',
+        metavar='#',
+        help='remove a todo item at the given index #'
+    )
 
-    parser.add_option('-r', '--remove', dest='remove', metavar='#',
-        help='remove a todo item at the given index #')
+    parser.add_argument(
+        '-m', '--modify',
+        dest='modify',
+        metavar='#',
+        help='modify a todo item at the given index #'
+    )
 
-    parser.add_option('-m', '--modify', dest='modify', metavar='#',
-        help='modify a todo item at the given index #')
+    args = parser.parse_args()
 
-    (options, args) = parser.parse_args()
-
-    return options
+    return args
 
 
 def main():
-    options = parse_arguments()
+    args = parse_arguments()
 
     load_todo_list()
 
-    if options.add:
-        add_todo(options.add)
+    if args.add:
+        add_todo(args.add)
         save_todo_list()
-    elif options.remove or options.modify:
+    elif args.remove or args.modify:
         try:
-            if options.modify:
-                idx = int(options.modify)
-            elif options.remove:
-                idx = int(options.remove)
+            if args.modify:
+                idx = int(args.modify)
+            elif args.remove:
+                idx = int(args.remove)
 
             assert(idx > 0)
             idx = idx - 1
 
-            if options.modify:
+            if args.modify:
                 modify_todo(idx)
-            elif options.remove:
+            elif args.remove:
                 remove_todo(idx)
 
             save_todo_list()

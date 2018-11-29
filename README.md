@@ -52,10 +52,10 @@ Reword:   Buy dog food.
 
 ## Remove
 
-You can remove items from your todo list when you're done.
+You can delete items from your todo list when you're done.
 
 ```bash
-$ todo.py -r 1
+$ todo.py -d 1
 
 Removed: Return books to the library.
 

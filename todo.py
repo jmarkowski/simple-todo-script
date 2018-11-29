@@ -58,7 +58,7 @@ class TodoList(object):
     def add(self, todo):
         self.todo_list.append(todo)
 
-    def remove(self, index):
+    def delete(self, index):
         item = self.todo_list[index]
         del self.todo_list[index]
         print('\nRemoved: {0}'.format(item))
@@ -82,10 +82,10 @@ def parse_arguments():
     )
 
     parser.add_argument(
-        '-r', '--remove',
-        dest='remove',
+        '-d', '--delete',
+        dest='delete',
         metavar='#',
-        help='remove a todo item at the given index #'
+        help='delete a todo item at the given index #'
     )
 
     parser.add_argument(
@@ -110,20 +110,20 @@ def main():
     if args.add:
         todo_list.add(args.add)
         todo_list.save()
-    elif args.remove or args.modify:
+    elif args.delete or args.modify:
         try:
             if args.modify:
                 idx = int(args.modify)
-            elif args.remove:
-                idx = int(args.remove)
+            elif args.delete:
+                idx = int(args.delete)
 
             assert(idx > 0)
             idx = idx - 1
 
             if args.modify:
                 todo_list.modify(idx)
-            elif args.remove:
-                todo_list.remove(idx)
+            elif args.delete:
+                todo_list.delete(idx)
 
             todo_list.save()
         except IndexError:

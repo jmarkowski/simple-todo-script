@@ -5,39 +5,32 @@ import sys
 import pickle
 
 
-TODO_FILE = os.path.expanduser('~/.todo_list')
-
-todo_list = []
-
-
 class RetCode():
     OK, ERR, ARG, WARN = range(4)
 
 
-def load_todo_list():
-    global todo_list, TODO_FILE
+def load_todo_list(todo_file):
+    todo_list = []
 
-    if os.path.isfile(TODO_FILE):
+    if os.path.isfile(todo_file):
         try:
-            f = open(TODO_FILE, 'r+b')
+            f = open(todo_file, 'r+b')
             todo_list = pickle.load(f)
             f.close()
         except EOFError:
             # File is empty.
             pass
 
+    return todo_list
 
-def save_todo_list():
-    global todo_list, TODO_FILE
 
-    f = open(TODO_FILE, 'wb')
+def save_todo_list(todo_file, todo_list):
+    f = open(todo_file, 'wb')
     pickle.dump(todo_list, f)
     f.close()
 
 
-def print_todo_list():
-    global todo_list
-
+def print_todo_list(todo_list):
     found_categories = []
 
     # Print all the uncategorized todos first
@@ -62,20 +55,17 @@ def print_todo_list():
                 print('\n {0} - {1}'.format(idx+1, item[cat_idx+1:].lstrip()))
 
 
-def add_todo(todo):
-    global todo_list
+def add_todo(todo_list, todo):
     todo_list.append(todo)
 
 
-def remove_todo(idx):
-    global todo_list
+def remove_todo(todo_list, idx):
     item = todo_list[idx]
     del todo_list[idx]
     print('\nRemoved: {0}'.format(item))
 
 
-def modify_todo(idx):
-    global todo_list
+def modify_todo(todo_list, idx):
     print('\nOriginal: {0}'.format(todo_list[idx]))
     reword = input('Reword:   ')
     todo_list[idx] = reword
@@ -115,11 +105,13 @@ def parse_arguments():
 def main():
     args = parse_arguments()
 
-    load_todo_list()
+    todo_file = os.path.expanduser('~/.todo_list')
+
+    todo_list = load_todo_list(todo_file)
 
     if args.add:
-        add_todo(args.add)
-        save_todo_list()
+        add_todo(todo_list, args.add)
+        save_todo_list(todo_file, todo_list)
     elif args.remove or args.modify:
         try:
             if args.modify:
@@ -131,11 +123,11 @@ def main():
             idx = idx - 1
 
             if args.modify:
-                modify_todo(idx)
+                modify_todo(todo_list, idx)
             elif args.remove:
-                remove_todo(idx)
+                remove_todo(todo_list, idx)
 
-            save_todo_list()
+            save_todo_list(todo_file, todo_list)
         except IndexError:
             print('Error: Index is out of range.')
         except ValueError:
@@ -143,7 +135,7 @@ def main():
         except AssertionError:
             print('Error: Index must be > 0.')
 
-    print_todo_list()
+    print_todo_list(todo_list)
 
     return RetCode.OK
 

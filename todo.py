@@ -40,9 +40,9 @@ class TodoList(object):
 
         # Print all the uncategorized todos first
         for k,item in enumerate(self.todo_list):
-            cat_idx = item.rfind(':')
-            if cat_idx > 0:
-                cat = item[0:cat_idx]
+            item_s = item.strip().split(':', 1)
+            if len(item_s) == 2:
+                cat = item_s[0].strip()
                 try:
                     found_categories.index(cat)
                 except ValueError:
@@ -55,9 +55,9 @@ class TodoList(object):
         for cat in found_categories:
             print('\n{0}:'.format(cat))
             for k,item in enumerate(self.todo_list):
-                cat_idx = item.rfind(':')
-                if cat_idx > 0 and cat == item[0:cat_idx]:
-                    print('\n {0} - {1}'.format(k+1, item[cat_idx+1:].lstrip()))
+                item_s = item.split(':', 1)
+                if len(item_s) == 2 and item_s[0] == cat:
+                    print('\n {0} - {1}'.format(k+1, item_s[1].strip()))
 
     def add(self, todo):
         self.todo_list.append(todo)

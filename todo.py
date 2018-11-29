@@ -38,21 +38,22 @@ class TodoList(object):
     def show(self):
         found_categories = []
 
+        print('')
         # Print all the uncategorized todos first
         for k,item in enumerate(self.todo_list):
             item_s = item.strip().split(':', 1)
             if len(item_s) == 1:
-                print('\n {0} - {1}'.format(k+1, item))
+                print('{:>3} - {}'.format(k+1, item.strip()))
             elif item_s[0].strip() not in found_categories:
                 found_categories.append(item_s[0].strip())
 
         # Print all categorized todos
         for cat in found_categories:
-            print('\n{0}:'.format(cat))
+            print('\n{}:\n'.format(cat))
             for k,item in enumerate(self.todo_list):
                 item_s = item.split(':', 1)
                 if len(item_s) == 2 and item_s[0] == cat:
-                    print('\n {0} - {1}'.format(k+1, item_s[1].strip()))
+                    print('{:>3} - {}'.format(k+1, item_s[1].strip()))
 
     def add(self, todo):
         self.todo_list.append(todo)

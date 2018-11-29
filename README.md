@@ -29,7 +29,6 @@ $ todo.py -a 'Return books to the library.'
 $ todo.py -a 'Buy cat food.'
 
  1 - Return books to the library.
-
  2 - Buy cat food.
 
 ```
@@ -45,7 +44,6 @@ Original: Buy cat food.
 Reword:   Buy dog food.
 
  1 - Return books to the library.
-
  2 - Buy dog food.
 
 ```
@@ -70,26 +68,26 @@ Finally, you may also categorize your todo list by prefixing the todo.
 ```bash
 $ todo.py -a 'HOME: Fix faucet.'
 
- 1 - Buy dog food.
+  1 - Buy dog food.
 
 HOME:
 
- 2 - Fix faucet.
+  2 - Fix faucet.
 
 ```
 
 ```bash
 $ todo -a 'PROJECT: Finish design diagram.'
 
- 1 - Buy dog food.
+  1 - Buy dog food.
 
 HOME:
 
- 2 - Fix faucet.
+  2 - Fix faucet.
 
 PROJECT:
 
- 3 - Finish design diagram.
+  3 - Finish design diagram.
 
 ```
 
@@ -98,16 +96,17 @@ Any new categorized todo items will automatically get grouped together.
 ```bash
 $ todo -a 'HOME: Replace bathroom mirror.'
 
- 1 - Buy dog food.
-
-PROJECT:
-
- 3 - Finish design diagram.
+  1 - Buy dog food.
 
 HOME:
 
- 2 - Fix faucet.
+  2 - Fix faucet.
+  4 - Replace bathroom mirror.
 
- 4 - Replace bathroom mirror.
+PROJECT:
+
+  3 - Finish design diagram.
 
 ```
+
+Note that the order in which todos are added is preserved in the list.

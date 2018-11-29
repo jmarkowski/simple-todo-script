@@ -38,6 +38,10 @@ class TodoList(object):
     def show(self):
         found_categories = []
 
+        if len(self.todo_list) == 0:
+            print("The todo list is empty. Add items with the '-a' argument.")
+            return
+
         print('')
         # Print all the uncategorized todos first
         for k,item in enumerate(self.todo_list):

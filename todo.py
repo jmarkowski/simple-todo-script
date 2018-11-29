@@ -139,5 +139,9 @@ def main():
 
 
 if __name__ == '__main__':
-    retcode = main()
+    try:
+        retcode = main()
+    except KeyboardInterrupt as e:
+        retcode = RetCode.WARN
+
     sys.exit(retcode)

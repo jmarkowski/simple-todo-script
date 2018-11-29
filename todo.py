@@ -9,66 +9,64 @@ class RetCode():
     OK, ERR, ARG, WARN = range(4)
 
 
-def load_todo_list(todo_file):
-    todo_list = []
+class TodoList(object):
 
-    if os.path.isfile(todo_file):
+    def __init__(self, todo_file=None):
+        self.todo_list = []
+        self.todo_file = None
+
+        if todo_file and os.path.isfile(todo_file):
+            self.load(todo_file)
+
+    def load(self, todo_file):
+        self.todo_file = todo_file
         try:
-            f = open(todo_file, 'r+b')
-            todo_list = pickle.load(f)
-            f.close()
+            with open(self.todo_file, 'r+b') as f:
+                self.todo_list = pickle.load(f)
         except EOFError:
             # File is empty.
             pass
 
-    return todo_list
+    def save(self):
+        with open(self.todo_file, 'wb') as f:
+            pickle.dump(self.todo_list, f)
 
+    def show(self):
+        found_categories = []
 
-def save_todo_list(todo_file, todo_list):
-    f = open(todo_file, 'wb')
-    pickle.dump(todo_list, f)
-    f.close()
-
-
-def print_todo_list(todo_list):
-    found_categories = []
-
-    # Print all the uncategorized todos first
-    for idx,item in enumerate(todo_list):
-        cat_idx = item.rfind(':')
-        if cat_idx > 0:
-            cat = item[0:cat_idx]
-            try:
-                found_categories.index(cat)
-            except ValueError:
-                # The category could not be found
-                found_categories.append(cat)
-        else:
-            print('\n {0} - {1}'.format(idx+1, item))
-
-    # Print all categorized todos
-    for cat in found_categories:
-        print('\n{0}:'.format(cat))
-        for idx,item in enumerate(todo_list):
+        # Print all the uncategorized todos first
+        for idx,item in enumerate(self.todo_list):
             cat_idx = item.rfind(':')
-            if cat_idx > 0 and cat == item[0:cat_idx]:
-                print('\n {0} - {1}'.format(idx+1, item[cat_idx+1:].lstrip()))
+            if cat_idx > 0:
+                cat = item[0:cat_idx]
+                try:
+                    found_categories.index(cat)
+                except ValueError:
+                    # The category could not be found
+                    found_categories.append(cat)
+            else:
+                print('\n {0} - {1}'.format(idx+1, item))
 
+        # Print all categorized todos
+        for cat in found_categories:
+            print('\n{0}:'.format(cat))
+            for idx,item in enumerate(self.todo_list):
+                cat_idx = item.rfind(':')
+                if cat_idx > 0 and cat == item[0:cat_idx]:
+                    print('\n {0} - {1}'.format(idx+1, item[cat_idx+1:].lstrip()))
 
-def add_todo(todo_list, todo):
-    todo_list.append(todo)
+    def add(self, todo):
+        self.todo_list.append(todo)
 
+    def remove(self, index):
+        item = self.todo_list[index]
+        del self.todo_list[index]
+        print('\nRemoved: {0}'.format(item))
 
-def remove_todo(todo_list, idx):
-    item = todo_list[idx]
-    del todo_list[idx]
-    print('\nRemoved: {0}'.format(item))
-
-
-def modify_todo(todo_list, idx):
-    print('\nOriginal: {0}'.format(todo_list[idx]))
-    reword = input('Reword:   ')
-    todo_list[idx] = reword
+    def modify(self, index):
+        print('\nOriginal: {0}'.format(self.todo_list[index]))
+        reword = input('Reword:   ')
+        self.todo_list[index] = reword
 
 
 def parse_arguments():
@@ -107,11 +105,11 @@ def main():
 
     todo_file = os.path.expanduser('~/.todo_list')
 
-    todo_list = load_todo_list(todo_file)
+    todo_list = TodoList(todo_file)
 
     if args.add:
-        add_todo(todo_list, args.add)
-        save_todo_list(todo_file, todo_list)
+        todo_list.add(args.add)
+        todo_list.save()
     elif args.remove or args.modify:
         try:
             if args.modify:
@@ -123,11 +121,11 @@ def main():
             idx = idx - 1
 
             if args.modify:
-                modify_todo(todo_list, idx)
+                todo_list.modify(idx)
             elif args.remove:
-                remove_todo(todo_list, idx)
+                todo_list.remove(idx)
 
-            save_todo_list(todo_file, todo_list)
+            todo_list.save()
         except IndexError:
             print('Error: Index is out of range.')
         except ValueError:
@@ -135,7 +133,7 @@ def main():
         except AssertionError:
             print('Error: Index must be > 0.')
 
-    print_todo_list(todo_list)
+    todo_list.show()
 
     return RetCode.OK
 

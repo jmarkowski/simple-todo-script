@@ -1,12 +1,16 @@
 #!/usr/bin/env python3
 import argparse
 import os
-import sys
 import pickle
+import sys
 
 
 class RetCode():
     OK, ERR, ARG, WARN = range(4)
+
+
+class TodoError(Exception):
+    pass
 
 
 class TodoList(object):
@@ -35,7 +39,7 @@ class TodoList(object):
         found_categories = []
 
         # Print all the uncategorized todos first
-        for idx,item in enumerate(self.todo_list):
+        for k,item in enumerate(self.todo_list):
             cat_idx = item.rfind(':')
             if cat_idx > 0:
                 cat = item[0:cat_idx]
@@ -45,28 +49,34 @@ class TodoList(object):
                     # The category could not be found
                     found_categories.append(cat)
             else:
-                print('\n {0} - {1}'.format(idx+1, item))
+                print('\n {0} - {1}'.format(k+1, item))
 
         # Print all categorized todos
         for cat in found_categories:
             print('\n{0}:'.format(cat))
-            for idx,item in enumerate(self.todo_list):
+            for k,item in enumerate(self.todo_list):
                 cat_idx = item.rfind(':')
                 if cat_idx > 0 and cat == item[0:cat_idx]:
-                    print('\n {0} - {1}'.format(idx+1, item[cat_idx+1:].lstrip()))
+                    print('\n {0} - {1}'.format(k+1, item[cat_idx+1:].lstrip()))
 
     def add(self, todo):
         self.todo_list.append(todo)
 
     def delete(self, index):
-        item = self.todo_list[index]
-        del self.todo_list[index]
-        print('\nRemoved: {0}'.format(item))
+        try:
+            item = self.todo_list[index]
+            del self.todo_list[index]
+            print('\nRemoved: {0}'.format(item))
+        except IndexError:
+            raise TodoError('Index {} is out of range.'.format(index + 1))
 
     def reword(self, index):
-        print('\nOriginal: {0}'.format(self.todo_list[index]))
-        reword = input('Reword:   ')
-        self.todo_list[index] = reword
+        try:
+            print('\nOriginal: {0}'.format(self.todo_list[index]))
+            reword = input('Reword:   ')
+            self.todo_list[index] = reword
+        except IndexError:
+            raise TodoError('Index {} is out of range.'.format(index + 1))
 
 
 def parse_arguments():
@@ -75,24 +85,26 @@ def parse_arguments():
     )
 
     parser.add_argument(
-        '-a', '--add',
+        '-a',
         dest='add',
-        metavar='"item"',
+        metavar='"todo item"',
         help='add a todo item'
     )
 
     parser.add_argument(
-        '-d', '--delete',
+        '-d',
         dest='delete',
         metavar='#',
-        help='delete a todo item at the given index #'
+        type=int,
+        help='delete a todo item at index #'
     )
 
     parser.add_argument(
-        '-r', '--reword',
+        '-r',
         dest='reword',
         metavar='#',
-        help='reword a todo item at the given index #'
+        type=int,
+        help='reword a todo item at index #'
     )
 
     args = parser.parse_args()
@@ -109,29 +121,13 @@ def main():
 
     if args.add:
         todo_list.add(args.add)
+    elif args.delete:
+        todo_list.delete(args.delete - 1)
+    elif args.reword:
+        todo_list.reword(args.reword - 1)
+
+    if args.add or args.delete or args.reword:
         todo_list.save()
-    elif args.delete or args.reword:
-        try:
-            if args.reword:
-                idx = int(args.reword)
-            elif args.delete:
-                idx = int(args.delete)
-
-            assert(idx > 0)
-            idx = idx - 1
-
-            if args.reword:
-                todo_list.reword(idx)
-            elif args.delete:
-                todo_list.delete(idx)
-
-            todo_list.save()
-        except IndexError:
-            print('Error: Index is out of range.')
-        except ValueError:
-            print('Error: Index must be an integer.')
-        except AssertionError:
-            print('Error: Index must be > 0.')
 
     todo_list.show()
 
@@ -143,5 +139,8 @@ if __name__ == '__main__':
         retcode = main()
     except KeyboardInterrupt as e:
         retcode = RetCode.WARN
+    except TodoError as e:
+        retcode = RetCode.ARG
+        print('ERROR: {}'.format(e))
 
     sys.exit(retcode)

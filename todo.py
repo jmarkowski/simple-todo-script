@@ -63,7 +63,7 @@ class TodoList(object):
         del self.todo_list[index]
         print('\nRemoved: {0}'.format(item))
 
-    def modify(self, index):
+    def reword(self, index):
         print('\nOriginal: {0}'.format(self.todo_list[index]))
         reword = input('Reword:   ')
         self.todo_list[index] = reword
@@ -89,10 +89,10 @@ def parse_arguments():
     )
 
     parser.add_argument(
-        '-m', '--modify',
-        dest='modify',
+        '-r', '--reword',
+        dest='reword',
         metavar='#',
-        help='modify a todo item at the given index #'
+        help='reword a todo item at the given index #'
     )
 
     args = parser.parse_args()
@@ -110,18 +110,18 @@ def main():
     if args.add:
         todo_list.add(args.add)
         todo_list.save()
-    elif args.delete or args.modify:
+    elif args.delete or args.reword:
         try:
-            if args.modify:
-                idx = int(args.modify)
+            if args.reword:
+                idx = int(args.reword)
             elif args.delete:
                 idx = int(args.delete)
 
             assert(idx > 0)
             idx = idx - 1
 
-            if args.modify:
-                todo_list.modify(idx)
+            if args.reword:
+                todo_list.reword(idx)
             elif args.delete:
                 todo_list.delete(idx)
 

@@ -34,12 +34,12 @@ $ todo.py -a 'Buy cat food.'
 
 ```
 
-## Modify
+## Reword
 
-You can modify your todo list.
+You can reword items in your todo list.
 
 ```bash
-$ todo.py -m 2
+$ todo.py -r 2
 
 Original: Buy cat food.
 Reword:   Buy dog food.
@@ -111,4 +111,3 @@ HOME:
  4 - Replace bathroom mirror.
 
 ```
-

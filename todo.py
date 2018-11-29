@@ -41,15 +41,10 @@ class TodoList(object):
         # Print all the uncategorized todos first
         for k,item in enumerate(self.todo_list):
             item_s = item.strip().split(':', 1)
-            if len(item_s) == 2:
-                cat = item_s[0].strip()
-                try:
-                    found_categories.index(cat)
-                except ValueError:
-                    # The category could not be found
-                    found_categories.append(cat)
-            else:
+            if len(item_s) == 1:
                 print('\n {0} - {1}'.format(k+1, item))
+            elif item_s[0].strip() not in found_categories:
+                found_categories.append(item_s[0].strip())
 
         # Print all categorized todos
         for cat in found_categories:

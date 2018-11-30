@@ -1,6 +1,8 @@
-# python-todo-script
+# Simple Todo Script
 
-Super simple CLI todo script to help track a list of your general todos.
+Super simple command line interface (CLI) todo script to help track a list of
+your todos.
+
 No more post-its!
 
 **Note: This script written for python3 only.**
@@ -77,7 +79,7 @@ HOME:
 ```
 
 ```bash
-$ todo -a 'PROJECT: Finish design diagram.'
+$ todo.py -a 'PROJECT: Finish design diagram.'
 
   1 - Buy dog food.
 
@@ -94,7 +96,7 @@ PROJECT:
 Any new categorized todo items will automatically get grouped together.
 
 ```bash
-$ todo -a 'HOME: Replace bathroom mirror.'
+$ todo.py -a 'HOME: Replace bathroom mirror.'
 
   1 - Buy dog food.
 

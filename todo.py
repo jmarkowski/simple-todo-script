@@ -81,7 +81,7 @@ class TodoList(object):
 
 def parse_arguments():
     parser = argparse.ArgumentParser(
-        description='Python Todo Script'
+        description='Simple Todo Script'
     )
 
     parser.add_argument(

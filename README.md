@@ -1,19 +1,24 @@
 # Simple Todo Script
 
-Super simple command line interface (CLI) todo script to help track a list of
-your todos.
+Super simple command line interface (CLI) todo script to help track your
+list of todos.
 
 No more post-its!
 
-**Note: This script written for python3 only.**
 
 # Details
 
-The todo.py script tracks your todo items in a `.todo_list` in your `$HOME`
-directory. If the file doesn't exist, one will be created. It forever uses this
-file to track your todos.
+The todo script tracks your todo items in a `.todo_list` in your home
+directory. If the file doesn't exist, one will be created. This file to
+track your todos.
 
-Items are listed in the order they are added.
+
+# Installation
+
+    $ git clone https://github.com/jmarkowski/simple-todo-script.git
+    $ cd simple-todo-script
+    $ python3 setup.py install
+
 
 # Usage
 
@@ -22,13 +27,13 @@ Items are listed in the order they are added.
 Initially, the todo list is empty. Let's add a couple of items.
 
 ```bash
-$ todo.py
+$ todo
 
-$ todo.py -a 'Return books to the library.'
+$ todo -a 'Return books to the library.'
 
  1 - Return books to the library.
 
-$ todo.py -a 'Buy cat food.'
+$ todo -a 'Buy cat food.'
 
  1 - Return books to the library.
  2 - Buy cat food.
@@ -40,7 +45,7 @@ $ todo.py -a 'Buy cat food.'
 You can reword items in your todo list.
 
 ```bash
-$ todo.py -r 2
+$ todo -r 2
 
 Original: Buy cat food.
 Reword:   Buy dog food.
@@ -55,7 +60,7 @@ Reword:   Buy dog food.
 You can delete items from your todo list when you're done.
 
 ```bash
-$ todo.py -d 1
+$ todo -d 1
 
 Removed: Return books to the library.
 
@@ -68,7 +73,7 @@ Removed: Return books to the library.
 Finally, you may also categorize your todo list by prefixing the todo.
 
 ```bash
-$ todo.py -a 'HOME: Fix faucet.'
+$ todo -a 'HOME: Fix faucet.'
 
   1 - Buy dog food.
 
@@ -79,7 +84,7 @@ HOME:
 ```
 
 ```bash
-$ todo.py -a 'PROJECT: Finish design diagram.'
+$ todo -a 'PROJECT: Finish design diagram.'
 
   1 - Buy dog food.
 
@@ -96,7 +101,7 @@ PROJECT:
 Any new categorized todo items will automatically get grouped together.
 
 ```bash
-$ todo.py -a 'HOME: Replace bathroom mirror.'
+$ todo -a 'HOME: Replace bathroom mirror.'
 
   1 - Buy dog food.
 

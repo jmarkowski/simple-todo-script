@@ -9,8 +9,7 @@ No more post-its!
 # Details
 
 The todo script tracks your todo items in a `.todo_list` in your home
-directory. If the file doesn't exist, one will be created. This file to
-track your todos.
+directory. If the file doesn't exist, one will be created.
 
 
 # Installation

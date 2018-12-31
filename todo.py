@@ -42,12 +42,14 @@ class TodoList(object):
             print("The todo list is empty. Add items with the '-a' argument.")
             return
 
-        print('')
+        first_found = False
         # Print all the uncategorized todos first
         for k,item in enumerate(self.todo_list):
             item_s = item.strip().split(':', 1)
             if len(item_s) == 1:
-                print('{:>3} - {}'.format(k+1, item.strip()))
+                print('{}{:>3} - {}' \
+                      .format('' if first_found else '\n', k+1, item.strip()))
+                first_found = True
             elif item_s[0].strip() not in found_categories:
                 found_categories.append(item_s[0].strip())
 

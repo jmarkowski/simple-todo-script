@@ -1,4 +1,4 @@
-__version__ = '1.0.0'
+__version__ = '1.0.1'
 __author__ = 'Jan Markowski'
 __email__ = 'jan' '@' 'markowski.ca'
 __url__ = 'https://github.com/jmarkowski/simple-todo-script'

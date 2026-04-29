@@ -98,21 +98,21 @@ def parse_arguments():
     )
 
     parser.add_argument(
-        '-a',
+        '-a', '--add',
         dest='add',
         metavar='"todo item"',
         help='add a todo item'
     )
 
     parser.add_argument(
-        '-c',
+        '-c', '--category',
         dest='category',
         metavar='"category"',
         help='category for the todo item (use with -a)'
     )
 
     parser.add_argument(
-        '-d',
+        '-d', '--delete',
         dest='delete',
         metavar='#',
         type=int,
@@ -120,7 +120,7 @@ def parse_arguments():
     )
 
     parser.add_argument(
-        '-r',
+        '-r', '--reword',
         dest='reword',
         metavar='#',
         type=int,

@@ -28,55 +28,57 @@ class TodoList(object):
             with open(self.todo_file, 'r+b') as f:
                 self.todo_list = pickle.load(f)
         except EOFError:
-            # File is empty.
             pass
 
     def save(self):
         with open(self.todo_file, 'wb') as f:
             pickle.dump(self.todo_list, f)
 
-    def show(self):
-        found_categories = []
+    def _format_item(self, item):
+        if 'category' in item:
+            return '{}: {}'.format(item['category'], item['text'])
+        return item['text']
 
+    def show(self):
         if len(self.todo_list) == 0:
             print("The todo list is empty. Add items with the '-a' argument.")
             return
 
-        first_found = False
-        # Print all the uncategorized todos first
-        for k,item in enumerate(self.todo_list):
-            item_s = item.strip().split(':', 1)
-            if len(item_s) == 1:
-                print('{}{:>3} - {}' \
-                      .format('' if first_found else '\n', k+1, item.strip()))
-                first_found = True
-            elif item_s[0].strip() not in found_categories:
-                found_categories.append(item_s[0].strip())
+        categories = []
+        for item in self.todo_list:
+            cat = item.get('category')
+            if cat and cat not in categories:
+                categories.append(cat)
 
-        # Print all categorized todos
-        for cat in found_categories:
+        for k, item in enumerate(self.todo_list):
+            if 'category' not in item:
+                print('{:>3} - {}'.format(k + 1, item['text']))
+
+        for cat in categories:
             print('\n{}:\n'.format(cat))
-            for k,item in enumerate(self.todo_list):
-                item_s = item.split(':', 1)
-                if len(item_s) == 2 and item_s[0] == cat:
-                    print('{:>3} - {}'.format(k+1, item_s[1].strip()))
+            for k, item in enumerate(self.todo_list):
+                if item.get('category') == cat:
+                    print('{:>3} - {}'.format(k + 1, item['text']))
 
-    def add(self, todo):
-        self.todo_list.append(todo)
+    def add(self, text, category=None):
+        item = {'text': text}
+        if category:
+            item['category'] = category
+        self.todo_list.append(item)
 
     def delete(self, index):
         try:
             item = self.todo_list[index]
             del self.todo_list[index]
-            print('\nRemoved: {0}'.format(item))
+            print('\nRemoved: {}'.format(self._format_item(item)))
         except IndexError:
             raise TodoError('Index {} is out of range.'.format(index + 1))
 
     def reword(self, index):
         try:
-            print('\nOriginal: {0}'.format(self.todo_list[index]))
-            reword = input('Reword:   ')
-            self.todo_list[index] = reword
+            item = self.todo_list[index]
+            print('\nOriginal: {}'.format(self._format_item(item)))
+            item['text'] = input('Reword:   ')
         except IndexError:
             raise TodoError('Index {} is out of range.'.format(index + 1))
 
@@ -91,6 +93,13 @@ def parse_arguments():
         dest='add',
         metavar='"todo item"',
         help='add a todo item'
+    )
+
+    parser.add_argument(
+        '-c',
+        dest='category',
+        metavar='"category"',
+        help='category for the todo item (use with -a)'
     )
 
     parser.add_argument(
@@ -122,7 +131,7 @@ def main():
     todo_list = TodoList(todo_file)
 
     if args.add:
-        todo_list.add(args.add)
+        todo_list.add(args.add, category=args.category)
     elif args.delete:
         todo_list.delete(args.delete - 1)
     elif args.reword:

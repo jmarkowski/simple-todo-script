@@ -79,7 +79,7 @@ class TodoList(object):
         try:
             item = self.todo_list[index]
             del self.todo_list[index]
-            print('\nRemoved: {}'.format(self._format_item(item)))
+            print('\nRemoved: {}\n'.format(self._format_item(item)))
         except IndexError:
             raise TodoError('Index {} is out of range.'.format(index + 1))
 
@@ -99,7 +99,7 @@ class TodoList(object):
                 item['category'] = category
             else:
                 item.pop('category', None)
-            print('\nRecategorized: {} -> {}'.format(old, self._format_item(item)))
+            print('\nRecategorized: {} -> {}\n'.format(old, self._format_item(item)))
         except IndexError:
             raise TodoError('Index {} is out of range.'.format(index + 1))
 
@@ -113,7 +113,7 @@ class TodoList(object):
             raise TodoError('Index {} is out of range.'.format(dst_index + 1))
 
         self.todo_list.insert(dst_index, item)
-        print('\nMoved: {} -> position {}'.format(
+        print('\nMoved: {} -> position {}\n'.format(
             self._format_item(item), dst_index + 1))
 
 

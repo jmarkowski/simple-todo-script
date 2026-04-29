@@ -94,29 +94,36 @@ class TodoList(object):
 
 def parse_arguments():
     parser = argparse.ArgumentParser(
-        description='Simple Todo Script'
+        description='Simple Todo Script',
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog='examples:\n'
+               '  todo -a "item one" "item two" "item three"\n'
+               '  todo -a "item one" "item two" -c ideas\n'
+               '  todo -d 3 5 7\n'
     )
 
     parser.add_argument(
         '-a', '--add',
         dest='add',
+        nargs='+',
         metavar='"todo item"',
-        help='add a todo item'
+        help='add one or more todo items'
     )
 
     parser.add_argument(
         '-c', '--category',
         dest='category',
         metavar='"category"',
-        help='category for the todo item (use with -a)'
+        help='category for the todo items (use with -a)'
     )
 
     parser.add_argument(
         '-d', '--delete',
         dest='delete',
+        nargs='+',
         metavar='#',
         type=int,
-        help='delete a todo item at index #'
+        help='delete one or more todo items at index #'
     )
 
     parser.add_argument(
@@ -139,14 +146,21 @@ def main():
 
     todo_list = TodoList(todo_file)
 
+    modified = False
+
     if args.add:
-        todo_list.add(args.add, category=args.category)
+        for text in args.add:
+            todo_list.add(text, category=args.category)
+        modified = True
     elif args.delete:
-        todo_list.delete(args.delete - 1)
+        for index in sorted(args.delete, reverse=True):
+            todo_list.delete(index - 1)
+        modified = True
     elif args.reword:
         todo_list.reword(args.reword - 1)
+        modified = True
 
-    if args.add or args.delete or args.reword:
+    if modified:
         todo_list.save()
 
     todo_list.show()

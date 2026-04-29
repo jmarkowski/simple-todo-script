@@ -91,6 +91,19 @@ class TodoList(object):
         except IndexError:
             raise TodoError('Index {} is out of range.'.format(index + 1))
 
+    def move(self, src_index, dst_index):
+        try:
+            item = self.todo_list.pop(src_index)
+        except IndexError:
+            raise TodoError('Index {} is out of range.'.format(src_index + 1))
+
+        if dst_index < 0 or dst_index > len(self.todo_list):
+            raise TodoError('Index {} is out of range.'.format(dst_index + 1))
+
+        self.todo_list.insert(dst_index, item)
+        print('\nMoved: {} -> position {}'.format(
+            self._format_item(item), dst_index + 1))
+
 
 def parse_arguments():
     parser = argparse.ArgumentParser(
@@ -100,6 +113,7 @@ def parse_arguments():
                '  todo -a "item one" "item two" "item three"\n'
                '  todo -a "item one" "item two" -c ideas\n'
                '  todo -d 3 5 7\n'
+               '  todo -m 5 1\n'
     )
 
     parser.add_argument(
@@ -124,6 +138,15 @@ def parse_arguments():
         metavar='#',
         type=int,
         help='delete one or more todo items at index #'
+    )
+
+    parser.add_argument(
+        '-m', '--move',
+        dest='move',
+        nargs=2,
+        metavar=('#', '#'),
+        type=int,
+        help='move a todo item from index # to index #'
     )
 
     parser.add_argument(
@@ -155,6 +178,9 @@ def main():
     elif args.delete:
         for index in sorted(args.delete, reverse=True):
             todo_list.delete(index - 1)
+        modified = True
+    elif args.move:
+        todo_list.move(args.move[0] - 1, args.move[1] - 1)
         modified = True
     elif args.reword:
         todo_list.reword(args.reword - 1)

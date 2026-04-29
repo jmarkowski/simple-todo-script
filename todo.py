@@ -52,36 +52,36 @@ class TodoList(object):
             return '{}: {}'.format(item['category'], item['text'])
         return item['text']
 
-    def show(self, show_done=False):
-        items = [(k, item) for k, item in enumerate(self.todo_list)
-                 if item.get('done', False) == show_done]
+    def _format_display(self, index, item):
+        text = item['text']
+        if item.get('done'):
+            text = '̶'.join(text) + '̶'
+        return '{:>3} - {}'.format(index + 1, text)
 
-        if len(items) == 0:
-            if show_done:
-                print("No completed items.")
-            else:
-                print("The todo list is empty. Add items with the '-a' argument.")
+    def show(self):
+        if len(self.todo_list) == 0:
+            print("The todo list is empty. Add items with the '-a' argument.")
             return
 
         categories = []
-        for _, item in items:
+        for item in self.todo_list:
             cat = item.get('category')
             if cat and cat not in categories:
                 categories.append(cat)
 
         has_uncategorized = False
-        for k, item in items:
+        for k, item in enumerate(self.todo_list):
             if 'category' not in item:
                 has_uncategorized = True
-                print('{:>3} - {}'.format(k + 1, item['text']))
+                print(self._format_display(k, item))
 
         for i, cat in enumerate(categories):
             if has_uncategorized or i > 0:
                 print('')
             print('{}:\n'.format(cat))
-            for k, item in items:
+            for k, item in enumerate(self.todo_list):
                 if item.get('category') == cat:
-                    print('{:>3} - {}'.format(k + 1, item['text']))
+                    print(self._format_display(k, item))
 
     def add(self, text, category=None):
         item = {'text': text}
@@ -105,13 +105,15 @@ class TodoList(object):
         except IndexError:
             raise TodoError('Index {} is out of range.'.format(index + 1))
 
-    def mark_done(self, index):
+    def toggle_done(self, index):
         try:
             item = self.todo_list[index]
             if item.get('done'):
-                raise TodoError('Item {} is already done.'.format(index + 1))
-            item['done'] = True
-            print('\nDone: {}\n'.format(self._format_item(item)))
+                item['done'] = False
+                print('\nUndone: {}\n'.format(self._format_item(item)))
+            else:
+                item['done'] = True
+                print('\nDone: {}\n'.format(self._format_item(item)))
         except IndexError:
             raise TodoError('Index {} is out of range.'.format(index + 1))
 
@@ -160,7 +162,6 @@ def parse_arguments():
                '  todo -m 5 1\n'
                '  todo -n 3 -c "new category"\n'
                '  todo --done 3 5\n'
-               '  todo --done\n'
                '  todo --clear-done\n'
     )
 
@@ -191,10 +192,10 @@ def parse_arguments():
     parser.add_argument(
         '--done',
         dest='done',
-        nargs='*',
+        nargs='+',
         metavar='#',
         type=int,
-        help='mark items as done at index #, or show done items if no index given'
+        help='toggle done status of one or more items at index #'
     )
 
     parser.add_argument(
@@ -251,9 +252,9 @@ def main():
     elif args.item_number and args.category is not None:
         todo_list.categorize(args.item_number - 1, args.category)
         modified = True
-    elif args.done is not None and len(args.done) > 0:
-        for index in sorted(args.done, reverse=True):
-            todo_list.mark_done(index - 1)
+    elif args.done:
+        for index in args.done:
+            todo_list.toggle_done(index - 1)
         modified = True
     elif args.clear_done:
         todo_list.clear_done()
@@ -272,8 +273,7 @@ def main():
     if modified:
         todo_list.save()
 
-    show_done = args.done is not None and len(args.done) == 0
-    todo_list.show(show_done=show_done)
+    todo_list.show()
 
     return RetCode.OK
 

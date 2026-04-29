@@ -69,12 +69,16 @@ class TodoList(object):
             if cat and cat not in categories:
                 categories.append(cat)
 
+        has_uncategorized = False
         for k, item in items:
             if 'category' not in item:
+                has_uncategorized = True
                 print('{:>3} - {}'.format(k + 1, item['text']))
 
-        for cat in categories:
-            print('\n{}:\n'.format(cat))
+        for i, cat in enumerate(categories):
+            if has_uncategorized or i > 0:
+                print('')
+            print('{}:\n'.format(cat))
             for k, item in items:
                 if item.get('category') == cat:
                     print('{:>3} - {}'.format(k + 1, item['text']))

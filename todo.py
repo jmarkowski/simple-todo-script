@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 import argparse
 import os
-import pickle
 import sys
 
 
@@ -24,15 +23,25 @@ class TodoList(object):
 
     def load(self, todo_file):
         self.todo_file = todo_file
-        try:
-            with open(self.todo_file, 'r+b') as f:
-                self.todo_list = pickle.load(f)
-        except EOFError:
-            pass
+        with open(self.todo_file, 'r') as f:
+            item = None
+            for line in f:
+                line = line.rstrip('\n')
+                if line.startswith('- text: '):
+                    if item:
+                        self.todo_list.append(item)
+                    item = {'text': line[len('- text: '):]}
+                elif line.startswith('  category: ') and item:
+                    item['category'] = line[len('  category: '):]
+            if item:
+                self.todo_list.append(item)
 
     def save(self):
-        with open(self.todo_file, 'wb') as f:
-            pickle.dump(self.todo_list, f)
+        with open(self.todo_file, 'w') as f:
+            for item in self.todo_list:
+                f.write('- text: {}\n'.format(item['text']))
+                if 'category' in item:
+                    f.write('  category: {}\n'.format(item['category']))
 
     def _format_item(self, item):
         if 'category' in item:
@@ -126,7 +135,7 @@ def parse_arguments():
 def main():
     args = parse_arguments()
 
-    todo_file = os.path.expanduser('~/.todo_list')
+    todo_file = os.path.expanduser('~/.todo_list.yaml')
 
     todo_list = TodoList(todo_file)
 

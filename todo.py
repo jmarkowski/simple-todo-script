@@ -16,7 +16,7 @@ class TodoList(object):
 
     def __init__(self, todo_file=None):
         self.todo_list = []
-        self.todo_file = None
+        self.todo_file = todo_file
 
         if todo_file and os.path.isfile(todo_file):
             self.load(todo_file)
@@ -55,7 +55,7 @@ class TodoList(object):
     def _format_display(self, index, item):
         text = item['text']
         if item.get('done'):
-            text = '̶'.join(text) + '̶'
+            text = '\033[9m{}\033[0m'.format(text)
         return '{:>3} - {}'.format(index + 1, text)
 
     def show(self):

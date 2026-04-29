@@ -33,6 +33,8 @@ class TodoList(object):
                     item = {'text': line[len('- text: '):]}
                 elif line.startswith('  category: ') and item:
                     item['category'] = line[len('  category: '):]
+                elif line.startswith('  done: ') and item:
+                    item['done'] = line[len('  done: '):] == 'true'
             if item:
                 self.todo_list.append(item)
 
@@ -42,30 +44,38 @@ class TodoList(object):
                 f.write('- text: {}\n'.format(item['text']))
                 if 'category' in item:
                     f.write('  category: {}\n'.format(item['category']))
+                if item.get('done'):
+                    f.write('  done: true\n')
 
     def _format_item(self, item):
         if 'category' in item:
             return '{}: {}'.format(item['category'], item['text'])
         return item['text']
 
-    def show(self):
-        if len(self.todo_list) == 0:
-            print("The todo list is empty. Add items with the '-a' argument.")
+    def show(self, show_done=False):
+        items = [(k, item) for k, item in enumerate(self.todo_list)
+                 if item.get('done', False) == show_done]
+
+        if len(items) == 0:
+            if show_done:
+                print("No completed items.")
+            else:
+                print("The todo list is empty. Add items with the '-a' argument.")
             return
 
         categories = []
-        for item in self.todo_list:
+        for _, item in items:
             cat = item.get('category')
             if cat and cat not in categories:
                 categories.append(cat)
 
-        for k, item in enumerate(self.todo_list):
+        for k, item in items:
             if 'category' not in item:
                 print('{:>3} - {}'.format(k + 1, item['text']))
 
         for cat in categories:
             print('\n{}:\n'.format(cat))
-            for k, item in enumerate(self.todo_list):
+            for k, item in items:
                 if item.get('category') == cat:
                     print('{:>3} - {}'.format(k + 1, item['text']))
 
@@ -91,6 +101,16 @@ class TodoList(object):
         except IndexError:
             raise TodoError('Index {} is out of range.'.format(index + 1))
 
+    def mark_done(self, index):
+        try:
+            item = self.todo_list[index]
+            if item.get('done'):
+                raise TodoError('Item {} is already done.'.format(index + 1))
+            item['done'] = True
+            print('\nDone: {}\n'.format(self._format_item(item)))
+        except IndexError:
+            raise TodoError('Index {} is out of range.'.format(index + 1))
+
     def categorize(self, index, category):
         try:
             item = self.todo_list[index]
@@ -102,6 +122,14 @@ class TodoList(object):
             print('\nRecategorized: {} -> {}\n'.format(old, self._format_item(item)))
         except IndexError:
             raise TodoError('Index {} is out of range.'.format(index + 1))
+
+    def clear_done(self):
+        removed = [item for item in self.todo_list if item.get('done')]
+        self.todo_list = [item for item in self.todo_list if not item.get('done')]
+        if removed:
+            print('\nCleared {} completed item(s).\n'.format(len(removed)))
+        else:
+            print('\nNo completed items to clear.\n')
 
     def move(self, src_index, dst_index):
         try:
@@ -127,6 +155,9 @@ def parse_arguments():
                '  todo -d 3 5 7\n'
                '  todo -m 5 1\n'
                '  todo -n 3 -c "new category"\n'
+               '  todo --done 3 5\n'
+               '  todo --done\n'
+               '  todo --clear-done\n'
     )
 
     parser.add_argument(
@@ -151,6 +182,22 @@ def parse_arguments():
         metavar='#',
         type=int,
         help='item index to recategorize (use with -c)'
+    )
+
+    parser.add_argument(
+        '--done',
+        dest='done',
+        nargs='*',
+        metavar='#',
+        type=int,
+        help='mark items as done at index #, or show done items if no index given'
+    )
+
+    parser.add_argument(
+        '--clear-done',
+        dest='clear_done',
+        action='store_true',
+        help='remove all completed items from the list'
     )
 
     parser.add_argument(
@@ -200,6 +247,13 @@ def main():
     elif args.item_number and args.category is not None:
         todo_list.categorize(args.item_number - 1, args.category)
         modified = True
+    elif args.done is not None and len(args.done) > 0:
+        for index in sorted(args.done, reverse=True):
+            todo_list.mark_done(index - 1)
+        modified = True
+    elif args.clear_done:
+        todo_list.clear_done()
+        modified = True
     elif args.delete:
         for index in sorted(args.delete, reverse=True):
             todo_list.delete(index - 1)
@@ -214,7 +268,8 @@ def main():
     if modified:
         todo_list.save()
 
-    todo_list.show()
+    show_done = args.done is not None and len(args.done) == 0
+    todo_list.show(show_done=show_done)
 
     return RetCode.OK
 

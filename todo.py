@@ -91,6 +91,18 @@ class TodoList(object):
         except IndexError:
             raise TodoError('Index {} is out of range.'.format(index + 1))
 
+    def categorize(self, index, category):
+        try:
+            item = self.todo_list[index]
+            old = self._format_item(item)
+            if category:
+                item['category'] = category
+            else:
+                item.pop('category', None)
+            print('\nRecategorized: {} -> {}'.format(old, self._format_item(item)))
+        except IndexError:
+            raise TodoError('Index {} is out of range.'.format(index + 1))
+
     def move(self, src_index, dst_index):
         try:
             item = self.todo_list.pop(src_index)
@@ -114,6 +126,7 @@ def parse_arguments():
                '  todo -a "item one" "item two" -c ideas\n'
                '  todo -d 3 5 7\n'
                '  todo -m 5 1\n'
+               '  todo -n 3 -c "new category"\n'
     )
 
     parser.add_argument(
@@ -128,7 +141,16 @@ def parse_arguments():
         '-c', '--category',
         dest='category',
         metavar='"category"',
-        help='category for the todo items (use with -a)'
+        help='set category (use with -a to categorize new items, '
+             'or with -n to recategorize an existing item)'
+    )
+
+    parser.add_argument(
+        '-n', '--item-number',
+        dest='item_number',
+        metavar='#',
+        type=int,
+        help='item index to recategorize (use with -c)'
     )
 
     parser.add_argument(
@@ -174,6 +196,9 @@ def main():
     if args.add:
         for text in args.add:
             todo_list.add(text, category=args.category)
+        modified = True
+    elif args.item_number and args.category is not None:
+        todo_list.categorize(args.item_number - 1, args.category)
         modified = True
     elif args.delete:
         for index in sorted(args.delete, reverse=True):
